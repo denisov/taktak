@@ -124,7 +124,7 @@ class Parser
             $problemUrl = $this->_getProblemUrl(explode('/', $item->href)[2]);
             $comment = $this->_parseProblemPage($problemUrl);
             if ($comment) {
-                echo "Найден коммент";
+                echo "Найдено решение";
                 $this->_stat[] = [
                     'comment_date' => $comment['date'],
                     'problem_name' => $item->text,
@@ -138,7 +138,7 @@ class Parser
 
 
     /**
-     * Парсит комментарии пользователя на странице проблемы
+     * Парсит ответы пользователя на странице проблемы
      *
      * @param string $problemUrl
      * @return array данные первого найденого коментария
@@ -150,7 +150,7 @@ class Parser
 
         $res = [];
 
-        $userComments = $html->find("div.comment a[href=/person/" . $this->_userId . "]");
+        $userComments = $html->find("div.answer a[href=/person/" . $this->_userId . "]");
         foreach ($userComments as $commentItem) {
             /** @var PHPHtmlParser\Dom\HtmlNode $commentItem */
             $dateStrNode = $commentItem->getParent()->getParent()->find(".date span", 0);
