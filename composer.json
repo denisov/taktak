@@ -1,0 +1,6 @@
+{
+    "require": {
+        "paquettg/php-html-parser": "^1.6",
+        "docopt/docopt": "^1.0"
+    }
+}
