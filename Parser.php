@@ -14,6 +14,9 @@ class Parser
     /** @var int обрабатываемый год */
     protected $_year;
 
+    /** @var int ограничение минимального время проблемы. */
+    protected $_minProblemDate;
+
     /** @var int время сна после запроса к так так так, сек */
     protected $_sleep;
 
@@ -22,19 +25,26 @@ class Parser
 
     /** @var PHPHtmlParser\Dom парсер DOM */
     protected $_dom;
-
     /**
      * @param int $userId
      * @param int $month
      * @param int $year
+     * @param int $monthDeep
      * @param int $sleep
      * @throws Parser_Exception
      */
-    public function __construct($userId, $month, $year, $sleep)
+    public function __construct($userId, $month, $year, $monthDeep, $sleep)
     {
         if (empty($userId)) {
             throw new Parser_Exception("Пустой userId");
         }
+
+        if (!checkdate($month, 1, $year)) {
+            throw new Parser_Exception("Неверный месяц($month) или год($year)");
+        }
+
+        $this->_minProblemDate = $this->_getMinProblemDate($month, $year, $monthDeep);
+
         $this->_userId = intval($userId);
         $this->_month = $month;
         $this->_year = $year;
@@ -42,6 +52,17 @@ class Parser
         $this->_sleep = $sleep;
 
         $this->_dom = new PHPHtmlParser\Dom();
+    }
+
+    protected function _getMinProblemDate($month, $year, $monthDeep)
+    {
+        $endDate = new DateTime();
+        $endDate->setDate($year, $month, 1)
+            ->setTime(0, 0, 0)
+            ->sub(new DateInterval('P' . $monthDeep . 'M'));
+
+        return $endDate;
+
     }
 
     /**
@@ -80,6 +101,12 @@ class Parser
      */
     public function parseUser()
     {
+        printf(
+            "Ищу решения за %d/%d в проблемах с %s\n",
+            $this->_month,
+            $this->_year,
+            $this->_minProblemDate->format('d.m.Y H:i:s')
+        );
         $html = $this->_dom->loadFromUrl($this->_getAnswerUrl(1));
         sleep($this->_sleep);
 
@@ -92,7 +119,10 @@ class Parser
         $problemsPerPage = $matches[1];
 
         for ($page = 1; $page <= ceil($totalProblems / $problemsPerPage); $page++ ) {
-            $this->_parseComments($page);
+            $res = $this->_parseComments($page);
+            if ($res === false) {
+                break;
+            }
         }
     }
 
@@ -111,6 +141,7 @@ class Parser
      * Парсит ajax страницу c ответами пользоватея
      *
      * @param int $page
+     * @return bool true - нормальный режим. false - превышено ограничение по времени проблемы
      */
     protected function _parseComments($page)
     {
@@ -123,8 +154,11 @@ class Parser
             echo $item->text  . ' (' . $item->href . ') ';
             $problemUrl = $this->_getProblemUrl(explode('/', $item->href)[2]);
             $comment = $this->_parseProblemPage($problemUrl);
+            if ($comment === false) {
+                return false;
+            }
             if ($comment) {
-                echo "Найдено решение";
+                echo "Решение: " . date ("Y-m-d", $comment['date']);
                 $this->_stat[] = [
                     'comment_date' => $comment['date'],
                     'problem_name' => $item->text,
@@ -134,6 +168,7 @@ class Parser
             echo PHP_EOL;
         }
         echo "======================================" . PHP_EOL;
+        return true;
     }
 
 
@@ -141,7 +176,8 @@ class Parser
      * Парсит ответы пользователя на странице проблемы
      *
      * @param string $problemUrl
-     * @return array данные первого найденого коментария
+     * @return array|false данные первого найденого коментария или
+     *          false если превышено ограничение по времени проблемы
      */
     protected function _parseProblemPage($problemUrl)
     {
@@ -149,6 +185,16 @@ class Parser
         sleep($this->_sleep);
 
         $res = [];
+
+        $problemDate = $html->find("#rightSticky .list", 0)->innerhtml;
+        /** @var \PHPHtmlParser\Dom\HtmlNode $problemDate */
+        preg_match("/(.+),<br \/>/", $problemDate, $m);
+        $problemDate = $this->_getTime($m[1]);
+        echo date("Y-m-d", $problemDate) . " ";
+        if ($problemDate < $this->_minProblemDate->getTimestamp()) {
+            echo PHP_EOL . "Превышено ограничение по времени" . PHP_EOL;
+            return false;
+        }
 
         $userComments = $html->find("div.answer a[href=/person/" . $this->_userId . "]");
         foreach ($userComments as $commentItem) {

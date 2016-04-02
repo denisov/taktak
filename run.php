@@ -10,12 +10,13 @@ mb_internal_encoding('UTF-8');
 date_default_timezone_set('Asia/Novosibirsk');
 
 $doc = <<<DOC
-Usage: run.php [--user=<user_id>] [--month=<month>] [--year=<year>] [--sleep=<sec>]
+Usage: run.php [--user=<user_id>] [--month=<month>] [--year=<year>] [--sleep=<sec>] [--month_deep=<n>]
 
 Options:
   --user=<user_id>  id пользователя. Мила 15525. Марина 17881 [default: 15525]
   --month=<month>   месяц. По-умолчанию текущий.
   --year=<year>     год. По-умолчанию текущий.
+  --month_deep=<n>  на сколько меяцев в прошлое уходить [default: 3]
   --sleep=<sec>     сон в сек между запросами [default: 1].
   
 DOC;
@@ -25,8 +26,9 @@ $userId = $args->args['--user'];
 $month = $args->args['--month'] ? intval($args->args['--month']) : date('n');
 $year = $args->args['--year'] ? intval($args->args['--year']) : date('Y');
 $sleep = $args->args['--sleep'];
+$monthDeep = $args->args['--month_deep'] - 1;
 
-$parser = new Parser($userId, $month, $year, $sleep);
+$parser = new Parser($userId, $month, $year, $monthDeep, $sleep);
 $parser->parseUser();
 
 $fileName = dirname(__FILE__) . '/reports/' . sprintf(
