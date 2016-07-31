@@ -74,7 +74,7 @@ class Parser
     protected function _getAnswerUrl($page)
     {
         return sprintf(
-            "http://taktaktak.org/person/%d/answers?page=%d&ajax=2",
+            "http://taktaktak.ru/person/%d/answers?page=%d&ajax=2",
             $this->_userId,
             $page
         );
@@ -89,7 +89,7 @@ class Parser
     protected function _getProblemUrl($problemId)
     {
         return sprintf(
-            "http://taktaktak.org/problem/%d",
+            "http://taktaktak.ru/problem/%d",
             $problemId
         );
     }

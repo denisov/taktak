@@ -55,16 +55,16 @@
         },
         {
             "name": "paquettg/php-html-parser",
-            "version": "1.6.9",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paquettg/php-html-parser.git",
-                "reference": "3c077b2461aff32226ab3b6c48e11e10e131c9c9"
+                "reference": "18845e09831dd0772b88b51e788a4f74c701224c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paquettg/php-html-parser/zipball/3c077b2461aff32226ab3b6c48e11e10e131c9c9",
-                "reference": "3c077b2461aff32226ab3b6c48e11e10e131c9c9",
+                "url": "https://api.github.com/repos/paquettg/php-html-parser/zipball/18845e09831dd0772b88b51e788a4f74c701224c",
+                "reference": "18845e09831dd0772b88b51e788a4f74c701224c",
                 "shasum": ""
             },
             "require": {
@@ -100,7 +100,7 @@
                 "html",
                 "parser"
             ],
-            "time": "2016-03-20 19:57:57"
+            "time": "2016-04-06 15:24:40"
         },
         {
             "name": "paquettg/string-encode",
