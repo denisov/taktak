@@ -25,6 +25,10 @@ class Parser
 
     /** @var PHPHtmlParser\Dom парсер DOM */
     protected $_dom;
+
+    /** @var PHPHtmlParser\CurlInterface */
+    protected $_curl;
+
     /**
      * @param int $userId
      * @param int $month
@@ -52,6 +56,7 @@ class Parser
         $this->_sleep = $sleep;
 
         $this->_dom = new PHPHtmlParser\Dom();
+        $this->_curl = new Curl();
     }
 
     protected function _getMinProblemDate($month, $year, $monthDeep)
@@ -74,7 +79,7 @@ class Parser
     protected function _getAnswerUrl($page)
     {
         return sprintf(
-            "http://taktaktak.ru/person/%d/answers?page=%d&ajax=2",
+            "https://taktaktak.ru/person/%d/answers?page=%d&ajax=2",
             $this->_userId,
             $page
         );
@@ -89,7 +94,7 @@ class Parser
     protected function _getProblemUrl($problemId)
     {
         return sprintf(
-            "http://taktaktak.ru/problem/%d",
+            "https://taktaktak.ru/problem/%d",
             $problemId
         );
     }
@@ -107,7 +112,7 @@ class Parser
             $this->_year,
             $this->_minProblemDate->format('d.m.Y H:i:s')
         );
-        $html = $this->_dom->loadFromUrl($this->_getAnswerUrl(1));
+        $html = $this->_dom->loadFromUrl($this->_getAnswerUrl(1), [], $this->_curl);
         sleep($this->_sleep);
 
         $paginator = $html->find(".paginator a", 0)->text;
@@ -146,7 +151,7 @@ class Parser
     protected function _parseComments($page)
     {
         echo "Страница $page" . PHP_EOL;
-        $html = $this->_dom->loadFromUrl($this->_getAnswerUrl($page));
+        $html = $this->_dom->loadFromUrl($this->_getAnswerUrl($page), [], $this->_curl);
         sleep($this->_sleep);
         echo "======================================" . PHP_EOL;
 
@@ -181,7 +186,7 @@ class Parser
      */
     protected function _parseProblemPage($problemUrl)
     {
-        $html = $this->_dom->loadFromUrl($problemUrl);
+        $html = $this->_dom->loadFromUrl($problemUrl, [], $this->_curl);
         sleep($this->_sleep);
 
         $res = [];

@@ -2,9 +2,8 @@
 
 require_once "vendor/autoload.php";
 require_once "Parser.php";
+require_once "Curl.php";
 require_once "Parser/Exception.php";
-
-use PHPHtmlParser\Dom;
 
 mb_internal_encoding('UTF-8');
 date_default_timezone_set('Asia/Novosibirsk');
