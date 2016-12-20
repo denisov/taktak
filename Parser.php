@@ -193,7 +193,8 @@ class Parser
 
         $problemDate = $html->find("#rightSticky .list", 0)->innerhtml;
         /** @var \PHPHtmlParser\Dom\HtmlNode $problemDate */
-        preg_match("/(.+),<br \/>/", $problemDate, $m);
+        preg_match("/(.+),[^<]*<br \/>/", $problemDate, $m);
+
         $problemDate = $this->_getTime($m[1]);
         echo date("Y-m-d", $problemDate) . " ";
         if ($problemDate < $this->_minProblemDate->getTimestamp()) {

@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 require_once "vendor/autoload.php";
@@ -17,7 +18,7 @@ Options:
   --year=<year>     год. По-умолчанию текущий.
   --month_deep=<n>  на сколько меяцев в прошлое уходить [default: 3]
   --sleep=<sec>     сон в сек между запросами [default: 1].
-  
+
 DOC;
 
 $args = Docopt::handle($doc);
